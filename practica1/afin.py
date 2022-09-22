@@ -1,11 +1,11 @@
 import gmpy2
 from gmpy2 import mpz
 
-print(mpz('123') + 1)
-print(10 - mpz(1))
-print(gmpy2.is_prime(17))
 
-print("check")
+# Ejemplos uso de gmpy2
+# print(mpz('123') + 1)
+# print(10 - mpz(1))
+# print(gmpy2.is_prime(17))
 
 
 
@@ -35,9 +35,6 @@ print("check")
 # 3
 # Asignar un estandar al parametro   i (fichero entrada)
 #                                    o (fichero salida)
-
-
-
 
 
 
