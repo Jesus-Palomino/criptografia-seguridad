@@ -1,5 +1,9 @@
 
 import argparse
+from fileinput import close
+import os
+import string
+from euclides_extendido import inverso_multiplicativo
 
 
 # Ejemplos uso de gmpy2
@@ -10,7 +14,7 @@ import argparse
 #EJECUCION:
 #   python afin.py --mode C --m 45 --a 15 --b 3 --i input.txt --o output.txt
 
-
+abecedario = list(string.ascii_lowercase)
 
 parser = argparse.ArgumentParser(description='Parse the func action')
 parser.add_argument('--mode', dest='mode', nargs='+', default=False,
@@ -37,12 +41,10 @@ if args.mode:
 
 # n = numero de letras
 if args.size:
-    print("Has elegido size: " + args.size[0])
     size = args.size[0]
 
 # a = coeficiente multiplicato
 if args.a:
-    print("Has elegido coef mult: " + args.a[0])
     a = args.a[0]
 
 # b = constante de desplazamiento
@@ -50,45 +52,68 @@ if args.b:
     b = args.b[0]
 
 if args.i:
-    i = args.i[0]
+    input = args.i[0]
 
 if args.o:
-    o = args.o[0]
+    output = args.o[0]
 
+if not args.mode or not a or not b or not args.size:
+    print("Error en formato de entrada. Ejemplo de formato correcto:\npython practica1/afin.py --mode C --m 45 --a 5 --b 3 --i input.txt --o output.txt")
+    exit(0)
+
+respuesta, aInverso = inverso_multiplicativo(int(a),int(b))
+if aInverso < 0:
+    aInverso = int(aInverso) * -1
+
+if respuesta is False:
+    print("Clave no valida, por favor, ingresa otra distinta.")
+    exit(0)
+else:
+    print("Clave valida")
 # ci = (a*mi + b) mod n
 
+entrada = open(os.getcwd()+"/ficheros/" + input)
+caracter = " "
 
 
-# c = testo cifrado 
+#Cifrado:
+if mode == 0:
+    caracterNumerico = []
+    caractCif = []
+    #Leo caracter a caracter
+    while caracter != "":
+        caracter = entrada.readline(1)
+        #En caso de que sea letra
+        if caracter != " " and caracter != '\n' and caracter != '':
+            #anyado a una lista el valor numerico
+            caracterNumerico.append(abecedario.index(caracter)+1)
+    entrada.close()
 
-# m = texto claro
+    for i in caracterNumerico:
+        #aplico formula
+        cif = (int(a)*int(i) + int(b)) % int(size)
+        #anyado a lista el valor textual
+        caractCif.append(abecedario[cif-1])
 
+    salida = open(os.getcwd()+"/ficheros/" + output, 'w')
+    salida.write("".join(caractCif))
 
+else:
 
+    caracterNumerico = []
+    caractCif = []
 
+    while caracter != "":
+        caracter = entrada.readline(1)
+        if caracter != " " and caracter != '\n' and caracter != '':
+            caracterNumerico.append(abecedario.index(caracter)+1)
+    entrada.close()
+    print(caracterNumerico)
 
+    for i in caracterNumerico:
+        cif = (int(aInverso)*(int(i) - int(b))) % int(size)
+        caractCif.append(abecedario[cif-1])
 
-
-# 1
-# Selector cifrado/descifrado
-# cinco valores de entrada
-
-# 2
-# Verificar que A y B MCD = 1 usando Euclides Extendido
-# Si no lo cumple = mensaje de error
-
-# 3
-# Asignar un estandar al parametro   i (fichero entrada)
-#                                    o (fichero salida)
-
-
-
-
-
-
-
-
-
-
-
-
+    salida = open(os.getcwd()+"/ficheros/" + output, 'w')
+    salida.write("".join(caractCif))
+    salida.close()
