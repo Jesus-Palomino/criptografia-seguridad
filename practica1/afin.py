@@ -108,7 +108,7 @@ else:
         if caracter != " " and caracter != '\n' and caracter != '':
             caracterNumerico.append(abecedario.index(caracter)+1)
     entrada.close()
-    print(caracterNumerico)
+
 
     for i in caracterNumerico:
         cif = (int(aInverso)*(int(i) - int(b))) % int(size)

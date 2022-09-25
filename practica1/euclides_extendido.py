@@ -20,7 +20,3 @@ def inverso_multiplicativo(a, b):
         return True, res[2]
     else:
         return False, res[2]
-
-
-print(inverso_multiplicativo(26,15))
-print(inverso_multiplicativo(270,196))
