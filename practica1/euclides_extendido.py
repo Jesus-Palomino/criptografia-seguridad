@@ -17,6 +17,6 @@ def inverso_multiplicativo(a, b):
     # Si el mcd es igual a 1 tiene inverso multiplicativo
     # El inverso multiplicativo es igual al valor de y en el resultado dado por la funcion
     if(res[0] == 1):
-        return True, res[2]
+        return True, res[1] %26
     else:
-        return False, res[2]
+        return False, res[1] %26
