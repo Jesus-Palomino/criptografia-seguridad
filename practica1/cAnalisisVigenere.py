@@ -14,6 +14,9 @@ import pandas as pd
 print("--------------\nCRIPTOANALISIS VIGENERE\n--------------\npython cAnalisisVigenere.py --help  Para obtener ayuda\n")
 
 abecedario = list(string.ascii_lowercase)
+diccionarioProb = {}
+diccionarioProbEsp = {'a': 0.1196,'b':0.00092,'c':0.0292,'d':0.0687,'e':0.1678,'f':0.0052,'g':0.0073,'h':0.0089,'i':0.0415,'j':0.0030,'k':0,'l':0.0837,'m':0.0212,'n':0.0701,'o':0.0869,'p':0.0277,'q':0.0153,'r':0.0494,'s':0.0788,'t':0.0331,'u':0.0480,'v':0.0039,'w':0,'x':0.0006,'y':0.014,'z':0.0019}
+diccionarioProbIng = {'a': 0.084,'b':0.0154,'c':0.0306,'d':0.0399,'e':0.1251,'f':0.0230,'g':0.0196,'h':0.0549,'i':0.0726,'j':0.0016,'k':0.0067,'l':0.0414,'m':0.0253,'n':0.0709,'o':0.0760,'p':0.0200,'q':0.0011,'r':0.0612,'s':0.0654,'t':0.0925,'u':0.0271,'v':0.0099,'w':0.0192,'x':0.0019,'y':0.0173,'z':0.0019}
 input = "texto_cifrado.txt"
 output = "output.txt"
 size = 26
@@ -23,6 +26,8 @@ parser.add_argument('--mode', dest='mode', nargs='+', default=False,
                         help='indica el modo de ejecucion --mode K para Kasiski y --mode IC para Indice de Coincidencia')
 parser.add_argument('--n', dest='n', nargs='+', default=False,
                         help='indica el numero de caracteres maximo')
+parser.add_argument('--l', dest='l', nargs='+', default=False,
+                        help='indica el lenguaje del texto --l esp para espanyol --l eng para ingles')
 parser.add_argument('--i', dest='i', nargs='+', default=False,
                         help='indica el nombre del fichero input')
 parser.add_argument('--o', dest='o', nargs='+', default=False,
@@ -38,7 +43,12 @@ if args.mode:
         mode = 1 #Modo IC
 if args.n:
     n = args.n[0]
-
+if args.l:
+    lan = args.l[0]
+    if lan == 'esp':
+        diccionarioProb = diccionarioProbEsp
+    else:
+        diccionarioProb = diccionarioProbIng
 if args.i:
     input = args.i[0]
 
@@ -53,7 +63,7 @@ cadena = entrada.read()
 if mode == 0:
     
     listaMCD = []
-
+    #Hacer la prueba varias veces con textos rand, muchos results y con esos "votacion"
     for i in range(2,int(n)):
         print("Probando con cadenas de " + str(i) + " Caractres")
         entradaAux = cadena
@@ -86,9 +96,18 @@ if mode == 0:
     print("el tamanio de clave posiblemente sea: " + str(listaMCD))
 
 
+#Tamanyo de clave por indice de coincidencia
 else:
     listaMedias = []
-    for i in range(2,int(n)):
+    listaLeng = []
+    icAleat = 0.038
+    if lan == "es":
+        icLan = 0.073
+    else:
+        icLan = 0.065
+
+    icMed = (icLan + icAleat)/2
+    for i in range(1,int(n)):
         numCols = i
         numFilas = round(len(cadena) / i)
         entrada.seek(0)
@@ -110,25 +129,92 @@ else:
             for fila in matrix:
                 if len(fila) == i:
                     lista.append(fila[col])
+
             total = 26
             listaUnic = pd.unique(lista)
             probTotal = 0
             probSum = 0
-
+            sum = 0
             for ele in listaUnic:
                 FrecEle = lista.count(ele)
+                #if ele == "c":
+                    #print(FrecEle)
                 ftot = FrecEle/len(lista)
                 probSum = probSum + ftot * ftot
-
 
             media =  media + probSum
             
         media = media / i
         listaMedias.append([i,media])
         print("para clave de tamanio "+ str(i) + ", el indice de coincidencia medio es: " + "{:.4f}".format(media))
+        if media > icMed:
+            #listaLeng.append([i,media])
+            print("Predice lenguaje para este tamanyo de clave\n-----------")
 
     listaMedias.sort(key = lambda x: x[1]) 
     tup = listaMedias[len(listaMedias)-1]
+    listaLeng.append(tup)
     print("\n-----------------")
     print("el tamanio de clave posiblemente sea: " + str(tup[0]) + " Con un I.C = " + "{:.4f}".format(tup[1]))
     print("-----------------\n")
+
+
+#Calculo de clave por Indice de frecuencia.
+for ncol, i in listaLeng:
+    #Cargar matriz
+    numFilas = round(len(cadena) / ncol)
+    entrada.seek(0)
+    matrix = []
+    
+    for k in range(0,numFilas):
+        tupla = []
+        for p in range(0,ncol):
+            caracter = entrada.readline(1)
+            if caracter != " " and caracter != '\n' and caracter != '':
+                tupla.append(caracter)
+        matrix.append(tupla)
+
+    listaGen = []
+    #print("Estudiando tamanyo: "+ str(ncol))
+    #Aplicar Indice de coincidencia con matriz cargada.
+    for col in range(0,ncol):
+        #print("Columna: " + str(col))
+        listaTuplaProb = []
+        lista = []
+        for fila in matrix:
+            if len(fila) == ncol:
+                lista.append(fila[col])
+        total = 26
+        listaUnic = pd.unique(lista)
+        probTotal = 0
+        probSum = 0
+
+        #Para cada elemento miro su probabilidad
+        for desp in range(0,25):
+            probSum = 0
+            for ele in listaUnic:
+                antele = ele
+                #print("antes buscaba: " + ele)
+                ele = ord(ele) + desp
+                if ele > 122:
+                    ele = ele - 26
+                if ele < 97:
+                    ele = ele + 26
+                ele = chr(ele)
+                #print("tras desplazarlo: "+ str(desp) + "ahora busco: " + ele)
+                FrecEle = lista.count(ele)
+                ftot = FrecEle/len(lista) #Fracción de la formula
+                icele = ftot * diccionarioProb.get(ele)
+                probSum = probSum + icele
+            #print("desp : "+ str(desp) + " prob: " +str(icele))    
+            listaTuplaProb.append(["{:.4f}".format(probSum), desp])    
+        
+        listaTuplaProb.sort(key = lambda x: x[0] , reverse=True)
+        apuesta = listaTuplaProb[0]
+        letra = (97+apuesta[1])
+        if letra > 122:
+            letra = letra - 26
+        listaGen.append(chr(letra))
+        print("La lista para columna: "+str(col)+" es:\n" + str(listaTuplaProb[:2]))
+
+    print(listaGen)

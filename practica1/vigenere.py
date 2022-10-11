@@ -1,9 +1,11 @@
 import argparse
+from curses.ascii import islower
 from fileinput import close
 import os
 import string
 from gmpy2 import mpz
 from euclides_extendido import inverso_multiplicativo
+
 
 
 #EJECUCION:
@@ -63,10 +65,12 @@ if mode == 0:
     while caracter != "":
         caracter = entrada.readline(1)
         #En caso de que sea letra
-        if caracter != " " and caracter != '\n' and caracter != '':
-            #anyado a una lista el valor numerico
-            listaAux.append(caracter)
-            caracterNumerico.append(abecedario.index(caracter)+1)
+        if caracter != " " and caracter != '\n' and caracter != '' and caracter != '.' and caracter != ',':
+            caracter = caracter.lower()
+            if caracter.islower() == True:
+                #anyado a una lista el valor numerico
+                listaAux.append(caracter)
+                caracterNumerico.append(abecedario.index(caracter)+1)
     entrada.close()
     print("\nTexto Claro:")
     print("".join(listaAux))
@@ -78,7 +82,7 @@ if mode == 0:
         if indice >= len(k):
             indice = 0
         #Si no, guardo el asci del caracter de la clave
-        newB = abecedario.index(k[indice]) + 1
+        newB = abecedario.index(k[indice])
         indice = indice + 1
 
         cif = (int(i) + int(newB)) % int(size)
@@ -112,7 +116,7 @@ else:
         if indice >= len(k):
             indice = 0
         #Si no, guardo el asci del caracter de la clave
-        newB = abecedario.index(k[indice]) + 1
+        newB = abecedario.index(k[indice])
         indice = indice + 1
         cif = (int(i) - int(newB)) % int(size)
         caractCif.append(abecedario[cif-1])
