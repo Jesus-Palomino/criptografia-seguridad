@@ -47,7 +47,7 @@ if args.o:
     output = args.o[0]
 
 if not args.mode or not k:
-    print("Error en formato de entrada. Ejemplo de formato correcto:\npython afin.py --mode C --m 26 --a 5 --b clave --i input.txt --o output.txt")
+    print("Error en formato de entrada. Ejemplo de formato correcto:\npython vigenere.py --mode C --k hola --i input.txt --o output.txt")
     exit(0)
 
 
@@ -126,7 +126,3 @@ else:
     salida.close()
     print("//////////////\nTexto Claro:")
     print("".join(caractCif) + "\n")
-
-
-def test_kasiski():
-    return
