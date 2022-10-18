@@ -104,6 +104,3 @@ class Hill:
                     num += self.matrizTexto[k][i] * self.matrizLlaveInversa.matrizInversa[j][k]
                 self.textoDecifradoNumerico.append(num%26)
         self.texto.numericoConvertirTexto(self.textoDecifradoNumerico)
-        
-
-prueba = Hill()
