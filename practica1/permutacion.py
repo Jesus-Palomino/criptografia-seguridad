@@ -190,7 +190,7 @@ else:
     while 'z' in matrixSalida[len(matrixSalida)-1]:
         matrixSalida[len(matrixSalida)-1].remove('z')
 
-
+    
     print("--------\nTexto Claro: ")
     for fila in matrixSalida:
         print("".join(fila))

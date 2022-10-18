@@ -6,7 +6,7 @@ from euclides_extendido import inverso_multiplicativo
 from fileinput import close
 
 #EJECUCION:
-#   python afin.py --mode C --m 26 --a 15 --b 3 --i input.txt --o output.txt
+#   python afin.py --mode C --m 26 --a 15 --b hola --i input.txt --o output.txt
 
 abecedario = list(string.ascii_lowercase)
 input = "input.txt"
@@ -62,7 +62,6 @@ if not args.mode or not a or not b or not args.size:
 respuesta, aInverso = inverso_multiplicativo(int(size),int(a))
 if aInverso < 0:
     aInverso = int(aInverso) * -1
-print(aInverso)
 
 if respuesta is False:
     print("Clave no valida, por favor, ingresa otra distinta.")
@@ -96,7 +95,14 @@ if mode == 0:
 
     for i in caracterNumerico:
         #aplico formula
-        cif = (int(a)*int(i) + int(b)) % int(size)
+        #Si ha llegado al final de la clave, vuelve al principio
+        if indice >= len(b):
+            indice = 0
+        #Si no, guardo el asci del caracter de la clave
+        newB = abecedario.index(b[indice]) + 1
+        indice = indice + 1
+
+        cif = (int(a)*int(i) + int(newB)) % int(size)
         #anyado a lista el valor textual
         caractCif.append(abecedario[cif-1])
         
@@ -117,11 +123,17 @@ else:
             caracterNumerico.append(abecedario.index(caracter)+1)
             listaAux.append(caracter)
     entrada.close()
-    print("\nTexto Cifrado:")
+    print("\nTexto en claro:")
     print("".join(listaAux))
     indice = 0
     for i in caracterNumerico:
-        cif = (int(aInverso)*(int(i) - int(b))) % int(size)
+        #Si ha llegado al final de la clave, vuelve al principio
+        if indice >= len(b):
+            indice = 0
+        #Si no, guardo el asci del caracter de la clave
+        newB = abecedario.index(b[indice]) + 1
+        indice = indice + 1
+        cif = (int(aInverso)*(int(i) - int(newB))) % int(size)
         caractCif.append(abecedario[cif-1])
 
     salida = open(os.getcwd()+"/ficheros/" + output, 'w')

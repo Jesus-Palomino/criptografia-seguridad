@@ -2,6 +2,7 @@ import argparse
 from ctypes import sizeof
 from fileinput import close
 import os
+from random import randint
 import string
 from gmpy2 import mpz
 from euclides_extendido import inverso_multiplicativo
@@ -62,38 +63,55 @@ cadena = entrada.read()
 #Modo kasiski
 if mode == 0:
     
-    listaMCD = []
+    listaLeng = []
     #Hacer la prueba varias veces con textos rand, muchos results y con esos "votacion"
     for i in range(2,int(n)):
+        flag = 0
+        aleat = 0
+        oportunidades = 0
         print("Probando con cadenas de " + str(i) + " Caractres")
-        entradaAux = cadena
-        distancias = []
-        buscador = entradaAux[0:i]
-        entradaAux = cadena[i:]
-        contador = entradaAux.count(buscador)
-        contadorAjuste = 0
-
-        while contador != 0:
-            distancia = 0
-            contadorAjuste = contadorAjuste + 1
+        while flag != 1:
+            entradaAux = cadena
+            distancias = []
+            buscador = entradaAux[aleat:(aleat+i)]
+            if oportunidades == 0:
+                entradaAux = cadena[i:]
+            else:
+                print("Otra oportunidad")
             contador = entradaAux.count(buscador)
-            distancia_index = entradaAux.find(buscador)
-            corte2 = distancia_index + i - contadorAjuste
-            entradaAux = entradaAux[corte2:]
-            if len(distancias) > 0:
-                distancia_index = distancia_index + ult_dist
-            ult_dist = distancia_index
-            if contador != 0:
-                distancias.append(distancia_index)
-            
+            contadorAjuste = 0
 
-        for d in distancias:
-            print("Distancia de la ocurrencia: " + str(d))
+            while contador != 0:
+                distancia = 0
+                contadorAjuste = contadorAjuste + 1
+                contador = entradaAux.count(buscador)
+                distancia_index = entradaAux.find(buscador)
+                corte2 = distancia_index + i - contadorAjuste
+                entradaAux = entradaAux[corte2:]
+                if len(distancias) > 0:
+                    distancia_index = distancia_index + ult_dist
+                ult_dist = distancia_index
+                if contador != 0:
+                    distancias.append(distancia_index)
+                
+            if len(distancias) > 0:
+                for d in distancias:
+                    print("Distancia de la ocurrencia: " + str(d))
+            
+            oportunidades = oportunidades + 1
+
+            md = mcd1(distancias)
+            if md != 1 and md != 0:
+                listaLeng.append([md, i])
+                flag = 1
+            else:
+                if oportunidades > 5:
+                    flag = 1
+                else:
+                    aleat = randint(0,len(cadena)-i)
         print("----------")
-        md = mcd1(distancias)
-        if md != 1 and md != 0:
-            listaMCD.append(md)
-    print("el tamanio de clave posiblemente sea: " + str(listaMCD))
+    for ele in listaLeng:
+        print("Con el tamanyo de cadena: "+str(ele[1])+"\nEl tamanio de clave posiblemente sea: " + str(ele[0]))
 
 
 #Tamanyo de clave por indice de coincidencia
@@ -109,18 +127,25 @@ else:
     icMed = (icLan + icAleat)/2
     for i in range(1,int(n)):
         numCols = i
-        numFilas = round(len(cadena) / i)
+        numFilas = round((len(cadena) / i))
         entrada.seek(0)
         matrix = []
         
-        for k in range(0,numFilas):
+        for k in range(0,numFilas-1):
             tupla = []
             for p in range(0,i):
                 caracter = entrada.readline(1)
-                if caracter != " " and caracter != '\n' and caracter != '':
-                    tupla.append(caracter)
+                while caracter == " " or caracter == '\n' or caracter == '':
+                    caracter = entrada.readline(1)
+                    if caracter == '':
+                        break
+                if caracter != '':
+                    caracter = caracter.lower()
+                    if caracter.islower() == True:
+                        tupla.append(caracter)
+
             matrix.append(tupla)
-         
+        
         media = 0
         #Aplicar Indice de coincidencia con matriz cargada.
         for col in range(0,i):
@@ -132,17 +157,20 @@ else:
 
             total = 26
             listaUnic = pd.unique(lista)
+           
+
             probTotal = 0
             probSum = 0
             sum = 0
             for ele in listaUnic:
                 FrecEle = lista.count(ele)
-                #if ele == "c":
-                    #print(FrecEle)
+               
                 ftot = FrecEle/len(lista)
-                probSum = probSum + ftot * ftot
+                ftot2 = (FrecEle-1)/(len(lista)-1)
+                probSum = probSum + ftot * ftot2
 
             media =  media + probSum
+
             
         media = media / i
         listaMedias.append([i,media])
@@ -155,12 +183,14 @@ else:
     tup = listaMedias[len(listaMedias)-1]
     listaLeng.append(tup)
     print("\n-----------------")
-    print("el tamanio de clave posiblemente sea: " + str(tup[0]) + " Con un I.C = " + "{:.4f}".format(tup[1]))
+    print("el tamanio de clave posiblemente sea: " + str(tup[0]+1) + " Con un I.C = " + "{:.4f}".format(tup[1]))
     print("-----------------\n")
 
 
+print("\n----------\nIniciando Descifrado de Clave\n---------")
 #Calculo de clave por Indice de frecuencia.
 for ncol, i in listaLeng:
+    print("\nNueva Hipotesis: \n tamanyo de clave = "+ str(ncol))
     #Cargar matriz
     numFilas = round(len(cadena) / ncol)
     entrada.seek(0)
@@ -170,10 +200,15 @@ for ncol, i in listaLeng:
         tupla = []
         for p in range(0,ncol):
             caracter = entrada.readline(1)
-            if caracter != " " and caracter != '\n' and caracter != '':
-                tupla.append(caracter)
+            while caracter == " " or caracter == '\n' or caracter == '':
+                    caracter = entrada.readline(1)
+                    if caracter == '':
+                        break
+            if caracter != '':
+                caracter = caracter.lower()
+                if caracter.islower() == True:
+                    tupla.append(caracter)
         matrix.append(tupla)
-
     listaGen = []
     #print("Estudiando tamanyo: "+ str(ncol))
     #Aplicar Indice de coincidencia con matriz cargada.
@@ -203,10 +238,11 @@ for ncol, i in listaLeng:
                 ele = chr(ele)
                 #print("tras desplazarlo: "+ str(desp) + "ahora busco: " + ele)
                 FrecEle = lista.count(ele)
+                FrecantEle = lista.count(antele)
                 ftot = FrecEle/len(lista) #Fracción de la formula
-                icele = ftot * diccionarioProb.get(ele)
-                probSum = probSum + icele
-            #print("desp : "+ str(desp) + " prob: " +str(icele))    
+                ftot2 = FrecantEle/len(lista)
+                icele = ftot * diccionarioProb.get(antele)
+                probSum = probSum + icele  
             listaTuplaProb.append(["{:.4f}".format(probSum), desp])    
         
         listaTuplaProb.sort(key = lambda x: x[0] , reverse=True)
@@ -215,6 +251,6 @@ for ncol, i in listaLeng:
         if letra > 122:
             letra = letra - 26
         listaGen.append(chr(letra))
-        print("La lista para columna: "+str(col)+" es:\n" + str(listaTuplaProb[:2]))
+        print("La letra mas probable para la columna: "+str(col)+" es: " + str(chr(letra)))
 
-    print(listaGen)
+    print("Podria ser la clave:\n                          "+ "".join(listaGen) + " ? ")
