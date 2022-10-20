@@ -4,7 +4,7 @@ import os
 class Textos:
 
     textoPlano = ""
-    textoCifrado = ""
+    textoProcesado = ""
     textoNumerico = []
 
     mapa = None                                     #   Diccionario de letras a numeros Ej. a:0
@@ -34,7 +34,7 @@ class Textos:
 
     def numericoConvertirTexto(self, texto = textoNumerico):
         for num in texto:
-            self.textoCifrado += self.abecedario[num]
+            self.textoProcesado += self.abecedario[num]
     
 
     def imprimirTextos(self, modo = True, padding = 0):
@@ -46,6 +46,6 @@ class Textos:
             mensaje2 = "Texto decifrado"
         print(mensaje1, "\n", self.textoPlano, "\n\n", mensaje2)
         if(padding):
-            print(self.textoCifrado[:-padding])
+            print(self.textoProcesado[:-padding])
         else:
-            print(self.textoCifrado)
+            print(self.textoProcesado)
