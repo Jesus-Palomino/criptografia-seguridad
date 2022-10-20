@@ -27,12 +27,11 @@ class MatrizLlave:
 
 		inverso = inverso_multiplicativo(self.det, 26)
 		if(not inverso[0]):
-			raise ValueError('El determinante de la matriz es 0, por lo que no se puede calcular su inversa')
+			raise ValueError('La matriz no tiene inverso multiplicativo')
 
 		self.inverso = inverso[1]
 
 		
-
 
 	def calcularCofactor(self, matriz, temp, p, q, n):
 	

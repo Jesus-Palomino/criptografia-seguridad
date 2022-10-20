@@ -15,12 +15,12 @@ class Textos:
         self.crearMapa()
         self.textoConvertirNumerico()
 
-
+    # Creacion de diccionario de letras con su equivalencia numerica
     def crearMapa(self):
         self.mapa = { i : self.abecedario[i] for i in range(0, len(self.abecedario) ) }
         self.mapa = {v: k for k, v in self.mapa.items()}
 
-
+    # Convertir texto plano a texto numerico
     def textoConvertirNumerico(self):
         fichero = open(os.getcwd()+"/ficheros/input.txt")
         while 1:
@@ -31,12 +31,12 @@ class Textos:
                 self.textoPlano += char
                 self.textoNumerico.append(self.mapa[char])
 
-
+    # Convertir texto numerico a texto plano
     def numericoConvertirTexto(self, texto = textoNumerico):
         for num in texto:
             self.textoProcesado += self.abecedario[num]
     
-
+    # Imprimir textos segun el tipo (cifrado o descifrado)
     def imprimirTextos(self, modo = True, padding = 0):
         if(modo):
             mensaje1 = "Texto original"
