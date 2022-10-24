@@ -28,3 +28,13 @@ def inverso_multiplicativo(a, b):
     # El inverso multiplicativo es igual al segundo valor regresado por euclides_extendido mod 26
     inv = gmpy2.f_divmod(res[1],26)[1]
     return (res[0] == 1, int(inv))
+
+
+
+# a = 15
+# m = 26
+
+# print(inverso_multiplicativo(a, m))
+
+# Da 7
+

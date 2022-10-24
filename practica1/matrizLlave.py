@@ -12,20 +12,24 @@ class MatrizLlave:
 	det = 0
 	inverso = 0
 	n = 0
+	m = 0									#	Cardinalidad
 
-	def __init__(self, matriz = [[]]):
+	def __init__(self, matriz, m):
+
 
 		self.matriz = matriz
 		self.n = len(self.matriz)
 
+		self.m = m
+
 		self.matrizAdj = [[0 for col in range(self.n)] for row in range(self.n)]
 		self.matrizInversa = [[0 for col in range(self.n)] for row in range(self.n)]
 
-		self.det = self.determinante(self.matriz, self.n) % 26
+		self.det = self.determinante(self.matriz, self.n) % self.m
 		if(self.det == 0):
 			raise ValueError('El determinante de la matriz es 0, por lo que no se puede calcular su inversa')
 
-		inverso = inverso_multiplicativo(self.det, 26)
+		inverso = inverso_multiplicativo(self.det, self.m)
 		if(not inverso[0]):
 			raise ValueError('La matriz no tiene inverso multiplicativo')
 
@@ -99,14 +103,14 @@ class MatrizLlave:
 				signo = [1, -1][(i + j) % 2]
 	
 				# Intercalar filas y columnas para obtener la transpuesta de la matriz cofactor
-				adj[j][i] = (signo * self.determinante(temp, self.n-1)) % 26
+				adj[j][i] = (signo * self.determinante(temp, self.n-1)) % self.m
 	
 	
 	def inversa(self):
 		
 		self.adjunta(self.matriz, self.matrizAdj)
 
-		# Multiplicar matriz de adyacencia por inverso multiplicativo mod 26 y hacer mod 26
+		# Multiplicar matriz de adyacencia por inverso multiplicativo mod m y hacer mod m
 		for i in range(self.n):
 			for j in range(self.n):
-				self.matrizInversa[i][j] = (self.matrizAdj[i][j] * self.inverso) % 26
+				self.matrizInversa[i][j] = (self.matrizAdj[i][j] * self.inverso) % self.m
