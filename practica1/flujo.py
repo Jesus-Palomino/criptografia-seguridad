@@ -56,7 +56,7 @@ class Flujo:
             llave.append(value % self.m)
             start += 1
 
-        self.llave = llave[self.lenSemilla:]
+        self.llave = llave[:len(llave) - self.lenSemilla]
 
 
     def cifrado(self):
