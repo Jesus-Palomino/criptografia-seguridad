@@ -56,13 +56,10 @@ if args.o:
     output = args.o[0]
 
 if not args.mode or not a or not b or not args.size:
-    print("Error en formato de entrada. Ejemplo de formato correcto:\npython afin.py --mode C --m 26 --a 5 --b clave --i input.txt --o output.txt")
+    print("Error en formato de entrada. Ejemplo de formato correcto:\npython afin.py --mode C --m 26 --a 15 --b 2 --i input.txt --o output.txt")
     exit(0)
 
-respuesta, aInverso = inverso_multiplicativo(int(size),int(a))
-if aInverso < 0:
-    aInverso = int(aInverso) * -1
-print(aInverso)
+respuesta, aInverso = inverso_multiplicativo(int(a),int(size))
 
 if respuesta is False:
     print("Clave no valida, por favor, ingresa otra distinta.")

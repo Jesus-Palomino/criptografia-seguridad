@@ -2,22 +2,23 @@ import argparse
 import os
 import string
 from gmpy2 import mpz
+import gmpy2
 from euclides_extendido import inverso_multiplicativo
 from fileinput import close
 
 #EJECUCION:
-#   python afin.py --mode C --m 26 --a 15 --b hola --i input.txt --o output.txt
+#   python afin.py --mode C --m 26 --a 15 --b 3 --i input.txt --o output.txt
 
 abecedario = list(string.ascii_lowercase)
 input = "input.txt"
 output = "output.txt"
 
-print("-----------\nCIFRADO AFIN\n-----------\npython afin.py --help  Para obtener ayuda\n")
+print("-----------\nCIFRADO AFIN MODIFICADO\n-----------\npython afin.py --help  Para obtener ayuda\n")
 
 parser = argparse.ArgumentParser(description='Parse the func action')
 parser.add_argument('--mode', dest='mode', nargs='+', default=False,
                         help='indica el modo de ejecucion --mode D para descifrar y --mode C para cifrar')
-parser.add_argument('--m', dest='size', nargs='+', default=False,
+parser.add_argument('--nbloques', dest='size', nargs='+', default=False,
                         help='indica el tamanio del espacio de texto')
 parser.add_argument('--a', dest='a', nargs='+', default=False,
                         help='indica el coeficiente multiplicativo')
@@ -39,8 +40,8 @@ if args.mode:
 
 # n = numero de letras
 if args.size:
-    size = args.size[0]
-
+    size = 26**int(args.size[0])
+    nBloqs = int(args.size[0])
 # a = coeficiente multiplicato
 if args.a:
     a = args.a[0]
@@ -58,17 +59,15 @@ if args.o:
 if not args.mode or not a or not b or not args.size:
     print("Error en formato de entrada. Ejemplo de formato correcto:\npython afin.py --mode C --m 26 --a 5 --b clave --i input.txt --o output.txt")
     exit(0)
+respuesta, aInverso = inverso_multiplicativo(int(a),int(size))
 
-respuesta, aInverso = inverso_multiplicativo(int(size),int(a))
-if aInverso < 0:
-    aInverso = int(aInverso) * -1
 
 if respuesta is False:
     print("Clave no valida, por favor, ingresa otra distinta.")
     exit(0)
 else:
     print("Clave valida")
-# ci = (a*mi + b) mod n
+
 
 entrada = open(os.getcwd()+"/ficheros/" + input)
 caracter = " "
@@ -82,63 +81,94 @@ if mode == 0:
 
     #Leo caracter a caracter
     while caracter != "":
-        caracter = entrada.readline(1)
-        #En caso de que sea letra
-        if caracter != " " and caracter != '\n' and caracter != '':
-            #anyado a una lista el valor numerico
-            caracterNumerico.append(abecedario.index(caracter)+1)
-            listaAux.append(caracter)
+        caracter = entrada.readline(int(nBloqs))
+        base = []
+        for c in caracter:
+            #En caso de que sea letra
+            if caracter != " " and caracter != '\n' and caracter != '':
+                #anyado a una lista el valor numerico
+                
+                base.append(abecedario.index(c))
+        numNuevaBase = 0
+        #CAMBIO DE BASE:
+        if len(base) > 0:
+            for cB in range(len(base)):
+                numCambiado = base[cB] * (26 ** (len(base)-1-cB))
+                numNuevaBase = numNuevaBase + numCambiado
+        listaAux.append(caracter)
+        caracterNumerico.append(numNuevaBase)
     entrada.close()
     print("\nTexto en claro:")
     print("".join(listaAux))
+    
     indice = 0
-
+    caracterNumerico.pop()
     for i in caracterNumerico:
         #aplico formula
-        #Si ha llegado al final de la clave, vuelve al principio
-        if indice >= len(b):
-            indice = 0
-        #Si no, guardo el asci del caracter de la clave
-        newB = abecedario.index(b[indice]) + 1
-        indice = indice + 1
-
-        cif = (int(a)*int(i) + int(newB)) % int(size)
-        #anyado a lista el valor textual
-        caractCif.append(abecedario[cif-1])
-        
+        cif = (int(a)*int(i) + int(b))
+        cif = gmpy2.f_divmod(cif,int(size))[1]
+        cuenta = 0
+        for i in range(nBloqs-1, -1, -1):
+            for j in range(0,25):
+                prueba = (26 ** i) * j + cuenta
+                pruebaFinal = (26 ** i) * (j-1) + cuenta
+                if prueba > cif:
+                    cuenta = cuenta + (26**i) * (j-1)
+                    #anyado a lista el valor textual
+                    caractCif.append(abecedario[j-1])
+                    break
 
     salida = open(os.getcwd()+"/ficheros/" + output, 'w')
     salida.write("".join(caractCif))
     print("////////////////\nTexto Cifrado:")
     print("".join(caractCif) + "\n")
 
-else:
 
+else:
     caracterNumerico = []
     caractCif = []
     listaAux = []
     while caracter != "":
-        caracter = entrada.readline(1)
-        if caracter != " " and caracter != '\n' and caracter != '':
-            caracterNumerico.append(abecedario.index(caracter)+1)
-            listaAux.append(caracter)
+        caracter = entrada.readline(int(nBloqs))
+        base = []
+        for c in caracter:
+            #En caso de que sea letra
+            if caracter != " " and caracter != '\n' and caracter != '':
+                #anyado a una lista el valor numerico
+                base.append(abecedario.index(c))
+        numNuevaBase = 0
+        #CAMBIO DE BASE:
+        if len(base) > 0:
+            for cB in range(len(base)):
+                numCambiado = base[cB] * (26 ** (len(base)-1-cB))
+                numNuevaBase = numNuevaBase + numCambiado
+        listaAux.append(caracter)        
+
+        caracterNumerico.append(numNuevaBase)
     entrada.close()
     print("\nTexto en claro:")
     print("".join(listaAux))
+    
     indice = 0
-    for i in caracterNumerico:
-        #Si ha llegado al final de la clave, vuelve al principio
-        if indice >= len(b):
-            indice = 0
-        #Si no, guardo el asci del caracter de la clave
-        newB = abecedario.index(b[indice]) + 1
-        indice = indice + 1
-        cif = (int(aInverso)*(int(i) - int(newB))) % int(size)
-        caractCif.append(abecedario[cif-1])
+    caracterNumerico.pop()
 
+    for i in caracterNumerico:
+        #aplico formula
+        cif = (int(aInverso)*(int(i) - int(b)))
+        cif = gmpy2.f_divmod(cif,int(size))[1]
+        cuenta = 0
+        for i in range(nBloqs-1, -1, -1):
+            for j in range(0,25):
+                prueba = (26 ** i) * j + cuenta
+                pruebaFinal = (26 ** i) * (j-1) + cuenta
+                if prueba > cif:
+                    cuenta = cuenta + (26**i) * (j-1)
+                    #anyado a lista el valor textual
+                    caractCif.append(abecedario[j-1])
+                    break
+    
     salida = open(os.getcwd()+"/ficheros/" + output, 'w')
     salida.write("".join(caractCif))
     salida.close()
     print("////////////////\nTexto Claro:")
     print("".join(caractCif) + "\n")
-

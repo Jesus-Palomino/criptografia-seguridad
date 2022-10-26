@@ -60,58 +60,85 @@ entrada = open(os.getcwd()+"/ficheros/" + input)
 caracter = " "
 cadena = entrada.read()
 
+
+#Numero de multiplos para cada mcd a estudiar
+numMultiplos = 5
+
+#Numero de cadenas distintas para cada tamanyo
+maxCadenas = 50
+
 #Modo kasiski
 if mode == 0:
-    
+    listaAux = []
     listaLeng = []
     #Hacer la prueba varias veces con textos rand, muchos results y con esos "votacion"
-    for i in range(2,int(n)):
-        flag = 0
-        aleat = 0
-        oportunidades = 0
-        print("Probando con cadenas de " + str(i) + " Caractres")
-        while flag != 1:
-            entradaAux = cadena
-            distancias = []
-            buscador = entradaAux[aleat:(aleat+i)]
-            if oportunidades == 0:
-                entradaAux = cadena[i:]
-            else:
-                print("Otra oportunidad")
-            contador = entradaAux.count(buscador)
-            contadorAjuste = 0
+    for i in range(3,int(n)):
+        for j in range(0,maxCadenas):
+            flag = 0
+            aleat = randint(0,len(cadena)-i)
+            oportunidades = 0
+            #print("Probando con cadenas de " + str(i) + " Caractres")
+            while flag != 1:
+                entradaAux = cadena
+                distancias = []
+                buscador = entradaAux[aleat:(aleat+i)]
+                if oportunidades == 0:
+                   entradaAux = cadena[i:]
 
-            while contador != 0:
-                distancia = 0
-                contadorAjuste = contadorAjuste + 1
                 contador = entradaAux.count(buscador)
-                distancia_index = entradaAux.find(buscador)
-                corte2 = distancia_index + i - contadorAjuste
-                entradaAux = entradaAux[corte2:]
-                if len(distancias) > 0:
-                    distancia_index = distancia_index + ult_dist
-                ult_dist = distancia_index
-                if contador != 0:
-                    distancias.append(distancia_index)
-                
-            if len(distancias) > 0:
-                for d in distancias:
-                    print("Distancia de la ocurrencia: " + str(d))
-            
-            oportunidades = oportunidades + 1
+                contadorAjuste = 0
 
-            md = mcd1(distancias)
-            if md != 1 and md != 0:
-                listaLeng.append([md, i])
-                flag = 1
-            else:
-                if oportunidades > 5:
-                    flag = 1
+                while contador != 0:
+                    distancia = 0
+                    contadorAjuste = contadorAjuste + 1
+                    contador = entradaAux.count(buscador)
+                    distancia_index = entradaAux.find(buscador)
+                    corte2 = distancia_index + i - contadorAjuste
+                    entradaAux = entradaAux[corte2:]
+                    if len(distancias) > 0:
+                        distancia_index = distancia_index + ult_dist
+                    ult_dist = distancia_index
+                    if contador != 0:
+                        distancias.append(distancia_index)
+                
+                oportunidades = oportunidades + 1
+
+                md = mcd1(distancias)
+                if md != 1 and md != 0:
+                    if md <1001:
+                        listaAux.append([md, i])
+                        flag = 1
                 else:
-                    aleat = randint(0,len(cadena)-i)
-        print("----------")
-    for ele in listaLeng:
-        print("Con el tamanyo de cadena: "+str(ele[1])+"\nEl tamanio de clave posiblemente sea: " + str(ele[0]))
+                    if oportunidades > 10:
+                        flag = 1
+                    else:
+                        aleat = randint(0,len(cadena)-i)
+            #print("----------")
+    #print(listaAux)
+    list2 = []
+    multiplos = []
+
+    for f in listaAux:
+        if f[0] not in multiplos:
+            multiplos.append(f[0])
+
+    print("La lista de minimo comun multiplos entre los vectores de distacias es la siguiente: ")
+    print(multiplos)
+    listaAux.sort(key = lambda x: x[0])
+    for f in listaAux:
+        for j in range(1,numMultiplos):
+            aux = f[0] * j
+            if aux not in list2:
+                #Para cada mcd, aplico también sus múltiplos
+                listaLeng.append([aux,f[1]])
+                list2.append(aux)
+    print("Tras anyadir los multiplos, se estudiaran a continuacion los siguientes tamanyos de clave: ")
+    list2.sort()
+    print(list2)
+
+    listaLeng.sort(key = lambda x: x[0])
+    # for ele in listaLeng:
+    #     print("Con el tamanyo de cadena: "+str(ele[1])+"\nEl tamanio de clave posiblemente sea: " + str(ele[0]))
 
 
 #Tamanyo de clave por indice de coincidencia
@@ -183,14 +210,16 @@ else:
     tup = listaMedias[len(listaMedias)-1]
     listaLeng.append(tup)
     print("\n-----------------")
-    print("el tamanio de clave posiblemente sea: " + str(tup[0]+1) + " Con un I.C = " + "{:.4f}".format(tup[1]))
+    print("el tamanio de clave posiblemente sea: " + str(tup[0]) + " Con un I.C = " + "{:.4f}".format(tup[1]))
     print("-----------------\n")
 
 
 print("\n----------\nIniciando Descifrado de Clave\n---------")
+print("Numero de claves: " + str(len(listaLeng)))
+listaClaves = []
 #Calculo de clave por Indice de frecuencia.
 for ncol, i in listaLeng:
-    print("\nNueva Hipotesis: \n tamanyo de clave = "+ str(ncol))
+    if mode != 0: print("\nNueva Hipotesis: \n tamanyo de clave = "+ str(ncol))
     #Cargar matriz
     numFilas = round(len(cadena) / ncol)
     entrada.seek(0)
@@ -210,7 +239,7 @@ for ncol, i in listaLeng:
                     tupla.append(caracter)
         matrix.append(tupla)
     listaGen = []
-    #print("Estudiando tamanyo: "+ str(ncol))
+    if mode != 0: print("Estudiando tamanyo: "+ str(ncol))
     #Aplicar Indice de coincidencia con matriz cargada.
     for col in range(0,ncol):
         #print("Columna: " + str(col))
@@ -251,6 +280,13 @@ for ncol, i in listaLeng:
         if letra > 122:
             letra = letra - 26
         listaGen.append(chr(letra))
-        print("La letra mas probable para la columna: "+str(col)+" es: " + str(chr(letra)))
-
-    print("Podria ser la clave:\n                          "+ "".join(listaGen) + " ? ")
+        if mode != 0:
+            print("La letra mas probable para la columna: "+str(col)+" es: " + str(chr(letra)))
+    if mode != 0:
+        print("Podria ser la clave:\n                          "+ "".join(listaGen) + " ? ")
+    listaClaves.append("".join(listaGen))
+if mode == 0:
+    print("Kasiski predice que la clave estará entre una de las "+ str(len(listaClaves)) + " claves guardadas en el fichero: clavesKasiski.txt")
+    clavesK = open(os.getcwd()+"/ficheros/clavesKasiski.txt", "w")
+    for ele in listaClaves:
+        clavesK.write(ele+"\n")

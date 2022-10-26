@@ -70,11 +70,12 @@ if mode == 0:
     matrix = []
     matrixCar = []
     lon = 0
+    flag = 0
     #Leo caracter a caracter
-    while caracter != "":
+    while flag != 1:
         caracter = entrada.readline(1)
         #En caso de que sea letra
-        if caracter == '\n':
+        if caracter == '\n' or caracter == '':
             if len(listaAux) != lon and lon != 0 and len(listaAux) != 0:
                 #add padding
                 numpad = lon - len(listaAux)
@@ -88,6 +89,8 @@ if mode == 0:
             matrixCar.append(listalet)
             listalet = []
             listaAux = []
+            if caracter == '':
+                flag = 1
             
         elif caracter != " " and caracter != '' and caracter != '.' and caracter != ',':
             caracter = caracter.lower()
@@ -95,10 +98,11 @@ if mode == 0:
                 #anyado a una lista el valor numerico
                 listalet.append(caracter)
                 listaAux.append(abecedario.index(caracter))
+    
     entrada.close()
-    print("\nTexto Claro:")
-    for fila in matrix:
-        print("".join(str(fila)))
+    print("--------\nTexto Claro:\n---------")
+    for fila in matrixCar:
+        print("".join(fila))
 
     matrixSalida = []
     index = 0
@@ -124,7 +128,7 @@ if mode == 0:
             indexcol = indexcol + 1 
         indexFila = indexFila +1
 
-    print("--------\nTexto Cifrado: ")
+    print("--------\nTexto Cifrado:\n---------")
     for fila in matrixCarSalida:
         print("".join(fila))
 
@@ -134,11 +138,12 @@ else:
     caractCif = []
     matrix = []
     lon = 0
+    flag = 0
     #Leo caracter a caracter
-    while caracter != "":
+    while flag != 1:
         caracter = entrada.readline(1)
         #En caso de que sea letra
-        if caracter == '\n':
+        if caracter == '\n' or caracter == '':
             if len(listaAux) != lon and lon != 0 and len(listaAux) != 0:
                 #add padding
                 numpad = lon - len(listaAux)
@@ -151,6 +156,8 @@ else:
             caractCif.append(listalet)
             listaAux = []
             listalet = []
+            if caracter == '':
+                flag =1
             
         elif caracter != " " and caracter != '' and caracter != '.' and caracter != ',':
             caracter = caracter.lower()
@@ -159,7 +166,7 @@ else:
                 listalet.append(caracter)
                 listaAux.append(abecedario.index(caracter))
     entrada.close()
-    print("\nTexto Cifrado:")
+    print("--------\nTexto Cifrado:\n---------")
     for fila in caractCif:
         print("".join(fila))
 
@@ -191,6 +198,6 @@ else:
         matrixSalida[len(matrixSalida)-1].remove('z')
 
     
-    print("--------\nTexto Claro: ")
+    print("--------\nTexto Claro:\n---------")
     for fila in matrixSalida:
         print("".join(fila))

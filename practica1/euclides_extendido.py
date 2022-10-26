@@ -26,5 +26,5 @@ def inverso_multiplicativo(a, b):
     res = euclides_extendido(a, b)
     # Si el mcd es igual a 1 tiene inverso multiplicativo
     # El inverso multiplicativo es igual al segundo valor regresado por euclides_extendido mod 26
-    inv = gmpy2.f_divmod(res[1],26)[1]
+    inv = gmpy2.f_divmod(res[1],b)[1]
     return (res[0] == 1, int(inv))
