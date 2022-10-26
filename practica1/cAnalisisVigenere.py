@@ -61,16 +61,13 @@ caracter = " "
 cadena = entrada.read()
 
 
-#Numero de multiplos para cada mcd a estudiar
-numMultiplos = 5
-
 #Numero de cadenas distintas para cada tamanyo
-maxCadenas = 50
+maxCadenas = 5000
 
 #Modo kasiski
 if mode == 0:
-    listaAux = []
     listaLeng = []
+    listaAux = []
     #Hacer la prueba varias veces con textos rand, muchos results y con esos "votacion"
     for i in range(3,int(n)):
         for j in range(0,maxCadenas):
@@ -81,9 +78,13 @@ if mode == 0:
             while flag != 1:
                 entradaAux = cadena
                 distancias = []
-                buscador = entradaAux[aleat:(aleat+i)]
+                
                 if oportunidades == 0:
                    entradaAux = cadena[i:]
+                   buscador = cadena[0:i]
+                else:
+                    aleat = randint(0,1000)
+                    buscador = entradaAux[aleat:(aleat+i)]
 
                 contador = entradaAux.count(buscador)
                 contadorAjuste = 0
@@ -102,40 +103,29 @@ if mode == 0:
                         distancias.append(distancia_index)
                 
                 oportunidades = oportunidades + 1
+                if(len(distancias)>1):
+                    for f in range(0,20):
+                        dist_aux = []
+                        for g in range(0,5):
+                            al = randint(0,len(distancias)-1)
+                            dist_aux.append(distancias[al])
+                        md = mcd1(dist_aux)
+                        if md != 1 and md != 0:
+                            if md <1005:
+                                listaAux.append([md, i])
+                                flag = 1
 
-                md = mcd1(distancias)
-                if md != 1 and md != 0:
-                    if md <1001:
-                        listaAux.append([md, i])
-                        flag = 1
-                else:
-                    if oportunidades > 10:
-                        flag = 1
-                    else:
-                        aleat = randint(0,len(cadena)-i)
-            #print("----------")
-    #print(listaAux)
+
     list2 = []
     multiplos = []
 
     for f in listaAux:
         if f[0] not in multiplos:
             multiplos.append(f[0])
-
+            listaLeng.append(f)
+    multiplos.sort()
     print("La lista de minimo comun multiplos entre los vectores de distacias es la siguiente: ")
     print(multiplos)
-    listaAux.sort(key = lambda x: x[0])
-    for f in listaAux:
-        for j in range(1,numMultiplos):
-            aux = f[0] * j
-            if aux not in list2:
-                #Para cada mcd, aplico también sus múltiplos
-                listaLeng.append([aux,f[1]])
-                list2.append(aux)
-    print("Tras anyadir los multiplos, se estudiaran a continuacion los siguientes tamanyos de clave: ")
-    list2.sort()
-    print(list2)
-
     listaLeng.sort(key = lambda x: x[0])
     # for ele in listaLeng:
     #     print("Con el tamanyo de cadena: "+str(ele[1])+"\nEl tamanio de clave posiblemente sea: " + str(ele[0]))
