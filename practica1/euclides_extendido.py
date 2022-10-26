@@ -34,7 +34,9 @@ def inverso_multiplicativo(a, b):
 # a = 15
 # m = 26
 
-# print(inverso_multiplicativo(a, m))
+# print(inverso_multiplicativo(m, a))
 
-# Da 7
+# Da 22
+
+
 
