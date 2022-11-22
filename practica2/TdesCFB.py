@@ -1,4 +1,5 @@
 import argparse
+import random
 from curses import KEY_BACKSPACE
 from operator import concat
 import os
@@ -36,15 +37,93 @@ if args.mode:
         print("Modo Descifrado")
         mode = 1 #Modo descifrar
 
-
-if args.clave:
-    clave = args.clave[0]
-
 if args.size:
     size = int(args.size[0])
 
 if args.vectoriIni:
     vectorIni = args.vectoriIni[0]
+
+
+if args.clave:
+    clave = args.clave[0]
+    keyfile = open(os.getcwd()+"/ficheros/clave.txt")
+    key = " "
+    Key = []
+    #Leo caracter a caracter
+    while key != "":
+        key = keyfile.readline(1)
+        #En caso de que sea letra
+        if key != " " and key != '\n' and key != '':
+            Key.append(key)
+    for j in range(3):
+        if j == 0:
+            plus = 0
+        if j == 1:
+            plus = 64
+        if j == 2:
+            plus = 128
+        contadorParidad = 0
+        if Key[7+plus] == '1':
+            contadorParidad+=1
+        if Key[15+plus] == '1':
+            contadorParidad+=1
+        if Key[24+plus] == '1':
+            contadorParidad+=1
+        if Key[31+plus] == '1':
+            contadorParidad+=1
+        if Key[39+plus] == '1':
+            contadorParidad+=1
+        if Key[47+plus] == '1':
+            contadorParidad+=1
+        if Key[55+plus] == '1':
+            contadorParidad+=1  
+        if Key[63+plus] == '1':
+            contadorParidad+=1
+else:
+    flag = 0
+    while flag == 0:
+        Key = []
+        #Genero aleatoriamente la clave
+        for i in range(192):
+            # randint function to generate
+            # 0, 1 randomly and converting
+            # the result into str
+            temp = str(random.randint(0, 1))
+            # Concatenation the random 0, 1
+            # to the final result
+            Key.append(temp)
+        for j in range(3):
+            if j == 0:
+                plus = 0
+            if j == 1:
+                plus = 64
+            if j == 2:
+                plus = 128
+            contadorParidad = 0
+            if Key[7+plus] == '1':
+                contadorParidad+=1
+            if Key[15+plus] == '1':
+                contadorParidad+=1
+            if Key[24+plus] == '1':
+                contadorParidad+=1
+            if Key[31+plus] == '1':
+                contadorParidad+=1
+            if Key[39+plus] == '1':
+                contadorParidad+=1
+            if Key[47+plus] == '1':
+                contadorParidad+=1
+            if Key[55+plus] == '1':
+                contadorParidad+=1  
+            if Key[63+plus] == '1':
+                contadorParidad+=1   
+
+            if contadorParidad % 2 != 0:
+                flag = 1
+                print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
+                print('k1: ' + "".join(Key[0:64]))
+                print('k2: ' + "".join(Key[64:128]))
+                print('k3: ' + "".join(Key[128:])+'\n')
+            
 
 entrada = open(os.getcwd()+"/ficheros/" + input)
 caracter = " "
@@ -53,8 +132,7 @@ open(os.getcwd()+"/ficheros/" + output, 'w').close()
 sal = open(os.getcwd()+"/ficheros/" + output, mode='a')
 caracter = " "
 
-keyfile = open(os.getcwd()+"/ficheros/clave.txt")
-key = " "
+
 
 Mtext = []
 Mtext_ini = []
@@ -63,7 +141,7 @@ ivv = open(os.getcwd()+"/ficheros/IV.txt")
 iv = " "
 
 IV = []
-Key = []
+
 PlainText =[]
 
 while caracter != "":
@@ -79,12 +157,6 @@ while iv != "":
     if iv != " " and iv != '\n' and iv != '':
         IV.append(iv)
 
-#Leo caracter a caracter
-while key != "":
-    key = keyfile.readline(1)
-    #En caso de que sea letra
-    if key != " " and key != '\n' and key != '':
-        Key.append(key)
 
 vectores = []
 vectores.append(IV)
@@ -130,10 +202,10 @@ for paso in range(0,3):
             break
         IV = vectores[indiceVectores-1]
         print('Cifrando bloque: ' + str(indiceVectores) + '....... ' )
-        print("".join(Mtext))
+        # print("".join(Mtext))
 
-        print('IV: ' )
-        print("".join(IV))
+        # print('IV: ' )
+        # print("".join(IV))
 
         #Shift Box
         while len(IV) < 64:
@@ -160,16 +232,16 @@ for paso in range(0,3):
         #Seleccion de bits
         salida = salida[0:size]    
 
-        print('Selecciono Bits' )
-        print("".join(salida))
+        # print('Selecciono Bits' )
+        # print("".join(salida))
 
         #if mode == 0:
         Mtext_aux = []
         for i in range(0, len(Mtext)):
             suma = (int(Mtext[i]) + int(salida[i])) % 2
             Mtext_aux.append(str(suma))
-        print('Tras sumarle plaintext: ')
-        print("".join(Mtext_aux))
+        # print('Tras sumarle plaintext: ')
+        # print("".join(Mtext_aux))
         # else:
         #     Mtext_aux = Mtext
 
@@ -200,5 +272,17 @@ for paso in range(0,3):
         indexLow = indexLow + size
         indiceVectores = indiceVectores +1
         print('-----> OK!')
-for s in solu:
-    print("".join(s))
+
+if mode == 0:
+    print('\nTexto Claro:')
+    print("".join(Mtext_ini))
+    print('------------------------------------')
+    print('Texto Cifrado')
+    print("".join(solu))
+
+else:
+    print('Texto Cifrado:')
+    print("".join(Mtext_ini))
+    print('------------------------------------')
+    print('Texto Claro')
+    print("".join(solu))

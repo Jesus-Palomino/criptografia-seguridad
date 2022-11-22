@@ -8,7 +8,7 @@ from operator import xor
 
 class des():
     
-    def init(mode,Key, Mtext):
+    def init(mode, Key, Mtext):
         degubb = 1
         listaDespK = [1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1]
 
