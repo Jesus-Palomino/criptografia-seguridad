@@ -7,6 +7,7 @@ from re import M
 import numpy as np
 from operator import xor
 import desStandart
+from os import sys
 
 input = "plaintextDES.txt"
 output = "output.txt"
@@ -59,7 +60,7 @@ if args.clave:
         contadorParidad+=1
     if Key[15] == '1':
         contadorParidad+=1
-    if Key[24] == '1':
+    if Key[23] == '1':
         contadorParidad+=1
     if Key[31] == '1':
         contadorParidad+=1

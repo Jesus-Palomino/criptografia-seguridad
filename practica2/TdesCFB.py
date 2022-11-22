@@ -1,12 +1,9 @@
 import argparse
 import random
-from curses import KEY_BACKSPACE
-from operator import concat
 import os
 from re import M
-import numpy as np
-from operator import xor
 import desStandart
+from os import sys
 
 input = "plaintextDES.txt"
 output = "output.txt"
@@ -55,6 +52,7 @@ if args.clave:
         #En caso de que sea letra
         if key != " " and key != '\n' and key != '':
             Key.append(key)
+    contadorParidad = []
     for j in range(3):
         if j == 0:
             plus = 0
@@ -62,23 +60,28 @@ if args.clave:
             plus = 64
         if j == 2:
             plus = 128
-        contadorParidad = 0
+        contadorParidad.append(0)
         if Key[7+plus] == '1':
-            contadorParidad+=1
+            contadorParidad[j]+=1
         if Key[15+plus] == '1':
-            contadorParidad+=1
-        if Key[24+plus] == '1':
-            contadorParidad+=1
+            contadorParidad[j]+=1
+        if Key[23+plus] == '1':
+            contadorParidad[j]+=1
         if Key[31+plus] == '1':
-            contadorParidad+=1
+            contadorParidad[j]+=1
         if Key[39+plus] == '1':
-            contadorParidad+=1
+            contadorParidad[j]+=1
         if Key[47+plus] == '1':
-            contadorParidad+=1
+            contadorParidad[j]+=1
         if Key[55+plus] == '1':
-            contadorParidad+=1  
+            contadorParidad[j]+=1  
         if Key[63+plus] == '1':
-            contadorParidad+=1
+            contadorParidad[j]+=1   
+
+    if contadorParidad[0] % 2 == 0 or contadorParidad[1] %2 == 0 or contadorParidad[2] == 0:
+        print('La clave no cumple requisitos de paridad:')
+        sys.exit()
+
 else:
     flag = 0
     while flag == 0:
@@ -92,6 +95,7 @@ else:
             # Concatenation the random 0, 1
             # to the final result
             Key.append(temp)
+            contadorParidad = []
         for j in range(3):
             if j == 0:
                 plus = 0
@@ -99,30 +103,30 @@ else:
                 plus = 64
             if j == 2:
                 plus = 128
-            contadorParidad = 0
+            contadorParidad.append(0)
             if Key[7+plus] == '1':
-                contadorParidad+=1
+                contadorParidad[j]+=1
             if Key[15+plus] == '1':
-                contadorParidad+=1
-            if Key[24+plus] == '1':
-                contadorParidad+=1
+                contadorParidad[j]+=1
+            if Key[23+plus] == '1':
+                contadorParidad[j]+=1
             if Key[31+plus] == '1':
-                contadorParidad+=1
+                contadorParidad[j]+=1
             if Key[39+plus] == '1':
-                contadorParidad+=1
+                contadorParidad[j]+=1
             if Key[47+plus] == '1':
-                contadorParidad+=1
+                contadorParidad[j]+=1
             if Key[55+plus] == '1':
-                contadorParidad+=1  
+                contadorParidad[j]+=1  
             if Key[63+plus] == '1':
-                contadorParidad+=1   
+                contadorParidad[j]+=1   
 
-            if contadorParidad % 2 != 0:
-                flag = 1
-                print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
-                print('k1: ' + "".join(Key[0:64]))
-                print('k2: ' + "".join(Key[64:128]))
-                print('k3: ' + "".join(Key[128:])+'\n')
+        if contadorParidad[0] % 2 != 0 or contadorParidad[1] %2 != 0 or contadorParidad[2] != 0:
+            flag = 1
+            print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
+            print('k1: ' + "".join(Key[0:64]))
+            print('k2: ' + "".join(Key[64:128]))
+            print('k3: ' + "".join(Key[128:])+'\n')
             
 
 entrada = open(os.getcwd()+"/ficheros/" + input)
