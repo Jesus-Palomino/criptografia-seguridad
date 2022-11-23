@@ -4,8 +4,9 @@ import os
 from re import M
 import desStandart
 from os import sys
+import convertirBinario
 
-input = "plaintextDES.txt"
+input = "/ficheros/plaintextDES.txt"
 output = "output.txt"
 
 print("-----------\nDES version CBC\n-----------\npython3 desCBC.py --help  Para obtener ayuda\n")
@@ -40,19 +41,35 @@ if args.size:
 if args.vectoriIni:
     vectorIni = args.vectoriIni[0]
 
+if args.i:
+    i = args.i[0]
+    if mode == 0:
+        bina = convertirBinario.convertirBinario()
+        if 'imagenes' in i:
+            #Procesar imagen
+            imgbin = bina.image_to_bits(i)
+            input = '/ficheros/binario.txt'
+
+        if 'textos' in i:
+            #Procesar textos
+            textbin = bina.text_to_bits(i)
+            input = '/ficheros/binario.txt'
+    else:
+        bina = convertirBinario.convertirBinario()
+        input = i
 
 if args.clave:
     clave = args.clave[0]
     keyfile = open(os.getcwd()+"/ficheros/clave.txt")
     key = " "
     Key = []
+    contadorParidad = []
     #Leo caracter a caracter
     while key != "":
         key = keyfile.readline(1)
         #En caso de que sea letra
         if key != " " and key != '\n' and key != '':
             Key.append(key)
-    contadorParidad = []
     for j in range(3):
         if j == 0:
             plus = 0
@@ -72,9 +89,9 @@ if args.clave:
         bloq1.append(Key[56+plus:64+plus])
 
         for b in bloq1:
-            contadorParidad = b.count('1')
+            contadorParidadls = b.count('1')
             
-            if contadorParidad % 2 == 0:
+            if contadorParidadls % 2 == 0:
                 print('La clave no cumple los criterios de paridad')
                 sys.exit()
 
@@ -106,14 +123,18 @@ else:
     print('k3: ' + "".join(Key[128:])+'\n')
             
 
-entrada = open(os.getcwd()+"/ficheros/" + input)
+entrada = open(os.getcwd()+input)
 caracter = " "
 
 open(os.getcwd()+"/ficheros/" + output, 'w').close()
 sal = open(os.getcwd()+"/ficheros/" + output, mode='a')
 caracter = " "
 
-
+if mode == 0:
+    contadorPadding = open(os.getcwd()+"/ficheros/contadorPadding.txt", 'w')
+else:
+    contadorPadding = open(os.getcwd()+"/ficheros/contadorPadding.txt", 'r')
+    contPad = int(contadorPadding.read())
 
 Mtext = []
 Mtext_ini = []
@@ -152,6 +173,12 @@ listKeys.append(key1)
 listKeys.append(key2)
 listKeys.append(key3)
 
+contadorPaddingax=0
+if mode == 0:
+    while len(Mtext_ini)%64 != 0:
+        contadorPaddingax+=1
+        Mtext_ini.insert(0, '0')
+
 
 solu = []
 Mtext_aux2 = []
@@ -177,12 +204,10 @@ for paso in range(0,3):
         #     while len(Mtext_ini) != indexAlt:
         #         Mtext_ini.insert(0, '0')
         
-        
         Mtext = Mtext_ini[indexLow:indexAlt]
-        if len(Mtext) <= 5:
-            break
+
         IV = vectores[indiceVectores-1]
-        print('Cifrando bloque: ' + str(indiceVectores) + '....... ' )
+        #print('Cifrando bloque: ' + str(indiceVectores) + '....... ' )
         # print("".join(Mtext))
 
         # print('IV: ' )
@@ -230,7 +255,7 @@ for paso in range(0,3):
         if mode == 0:
             vectores.append(Mtext_aux)
         else:
-            vectores.append(salida)
+            vectores.append(Mtext)
         # if mode == 1:
         #     print('IV:')
         #     print("".join(IV))
@@ -252,7 +277,9 @@ for paso in range(0,3):
         indexAlt = indexAlt + size
         indexLow = indexLow + size
         indiceVectores = indiceVectores +1
-        print('-----> OK!')
+        #print('-----> OK!')
+
+        
 
 if mode == 0:
     print('\nTexto Claro:')
@@ -260,6 +287,24 @@ if mode == 0:
     print('------------------------------------')
     print('Texto Cifrado')
     print("".join(solu))
+    contadorPadding.write(str(contadorPaddingax))
+    sal.close()
+    out = open(os.getcwd()+"/ficheros/" + output,'r')
+    auxout = out.read()
+    out.close()
+    if args.i:
+        if 'imagenes' in args.i[0]:
+            #Procesar imagen
+            out = open(os.getcwd()+"/imagenes/imagenCifrada.txt",'w')
+            out.write(auxout)
+
+        if 'textos' in args.i[0]:
+            #Procesar textos
+            out = open(os.getcwd()+"/textos/textoCifrado.txt",'w')
+            out.write(auxout)
+
+            
+
 
 else:
     print('Texto Cifrado:')
@@ -267,3 +312,23 @@ else:
     print('------------------------------------')
     print('Texto Claro')
     print("".join(solu))
+    sal.close()
+
+    out = open(os.getcwd()+"/ficheros/" + output,'r')
+    auxout = out.read()
+    auxout = auxout.replace('\n', '')
+    realout = auxout[contPad:]
+    out.close()
+
+    out = open(os.getcwd()+"/ficheros/" + output,'w')
+    out.write(realout)
+    out.close()
+
+    if args.i:
+        if 'imagenes' in args.i[0]:
+            #Procesar imagen
+            imgbin = bina.bits_to_image('ficheros/output.txt', imagen='/imagenes/imagenClaro.jpg')
+
+        if 'textos' in args.i[0]:
+            #Procesar textos
+            textbin = bina.bits_to_text('ficheros/output.txt', texto='textos/textoClaro.txt')

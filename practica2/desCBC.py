@@ -8,8 +8,9 @@ import numpy as np
 from operator import xor
 import desStandart
 from os import sys
+import convertirBinario
 
-input = "plaintextDES.txt"
+input = "/ficheros/plaintextDES.txt"
 output = "output.txt"
 
 print("-----------\nDES version CBC\n-----------\npython3 desCBC.py --help  Para obtener ayuda\n")
@@ -38,9 +39,34 @@ if args.mode:
 if args.vectoriIni:
     vectorIni = args.vectoriIni[0]
 
-entrada = open(os.getcwd()+"/ficheros/" + input)
+if args.i:
+    i = args.i[0]
+    if mode == 0:
+        bina = convertirBinario.convertirBinario()
+        if 'imagenes' in i:
+            #Procesar imagen
+            imgbin = bina.image_to_bits(i)
+            input = '/ficheros/binario.txt'
+
+        if 'textos' in i:
+            #Procesar textos
+            textbin = bina.text_to_bits(i)
+            input = '/ficheros/binario.txt'
+    else:
+        bina = convertirBinario.convertirBinario()
+        input = i
+
+
+entrada = open(os.getcwd()+ input)
 caracter = " "
 
+if mode == 0:
+    contadorPadding = open(os.getcwd()+"/ficheros/contadorPadding.txt", 'w')
+else:
+    contadorPadding = open(os.getcwd()+"/ficheros/contadorPadding.txt", 'r')
+    contPad = int(contadorPadding.read())
+
+sal = open(os.getcwd()+"/ficheros/" + output,'w').close()
 sal = open(os.getcwd()+"/ficheros/" + output, mode='a')
 caracter = " "
 
@@ -94,7 +120,7 @@ else:
     print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
     print("".join(Key)+'\n\n')
 
-    
+
 Mtext = []
 Mtext_ini = []
 
@@ -117,6 +143,8 @@ while iv != "":
     if iv != " " and iv != '\n' and iv != '':
         IV.append(iv)
 
+        
+contadorPaddingax = 0
 contBloq = 1
 indexAlt = 64
 indexLow = 0
@@ -125,15 +153,21 @@ vectores = []
 vectores.append(IV)
 indiceVectores = 1
 textoCifrado = []
+
+if mode == 0:
+    while len(Mtext_ini)%64 != 0:
+        contadorPaddingax+=1
+        Mtext_ini.insert(0, '0')
+
 while indexAlt <= (len(Mtext_ini)+63):
-    if indexAlt > len(Mtext_ini):
-        while len(Mtext_ini) != indexAlt:
-            Mtext_ini.insert(0, '0')
+
     Mtext = Mtext_ini[indexLow:indexAlt]
 
-    print('Cifrando Bloque '+  str(contBloq)+'....')
+    #print('Cifrando Bloque '+  str(contBloq)+'....')
     #print("".join(Mtext))
-    vectores.append(Mtext)
+    if mode != 0:
+        vectores.append(Mtext)
+
     IV = vectores[indiceVectores-1]
     # if mode == 0:
     #     print('IV:')
@@ -152,9 +186,8 @@ while indexAlt <= (len(Mtext_ini)+63):
        
     salida = desStandart.des.init(mode,Key, Mtext_aux)
 
-    # if mode == 1:
-    #     print('IV:')
-    #     print("".join(IV))
+    if mode == 0:
+        vectores.append(salida)
 
     if mode == 1:
         Mtext_aux = []
@@ -166,7 +199,7 @@ while indexAlt <= (len(Mtext_ini)+63):
     if mode == 0:
         sal.write("".join(salida))
         sal.write("\n")
-        print('----> OK !')
+        #print('----> OK !')
         textoCifrado.append("".join(salida))
         # print('Salida: ')
         # print("".join(salida))
@@ -177,7 +210,7 @@ while indexAlt <= (len(Mtext_ini)+63):
         sal.write("".join(PlainText))
         textoCifrado.append("".join(PlainText))
         sal.write("\n")
-        print('----> OK !')
+        #print('----> OK !')
     indexAlt = indexAlt + 64
     indexLow = indexLow + 64
     indiceVectores = indiceVectores +1
@@ -189,6 +222,24 @@ if mode == 0:
     print('------------------------------------')
     print('Texto Cifrado')
     print("".join(textoCifrado))
+    contadorPadding.write(str(contadorPaddingax))
+    sal.close()
+    out = open(os.getcwd()+"/ficheros/" + output,'r')
+    auxout = out.read()
+    out.close()
+    if args.i:
+        if 'imagenes' in args.i[0]:
+            #Procesar imagen
+            out = open(os.getcwd()+"/imagenes/imagenCifrada.txt",'w')
+            out.write(auxout)
+
+        if 'textos' in args.i[0]:
+            #Procesar textos
+            out = open(os.getcwd()+"/textos/textoCifrado.txt",'w')
+            out.write(auxout)
+
+            
+
 
 else:
     print('Texto Cifrado:')
@@ -196,3 +247,23 @@ else:
     print('------------------------------------')
     print('Texto Claro')
     print("".join(textoCifrado))
+    sal.close()
+
+    out = open(os.getcwd()+"/ficheros/" + output,'r')
+    auxout = out.read()
+    auxout = auxout.replace('\n', '')
+    realout = auxout[contPad:]
+    out.close()
+
+    out = open(os.getcwd()+"/ficheros/" + output,'w')
+    out.write(realout)
+    out.close()
+
+    if args.i:
+        if 'imagenes' in args.i[0]:
+            #Procesar imagen
+            imgbin = bina.bits_to_image('ficheros/output.txt', imagen='/imagenes/imagenClaro.jpg')
+
+        if 'textos' in args.i[0]:
+            #Procesar textos
+            textbin = bina.bits_to_text('ficheros/output.txt', texto='textos/textoClaro.txt')

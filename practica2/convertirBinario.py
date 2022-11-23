@@ -7,17 +7,6 @@ class convertirBinario:
     imagen = "img.jpg"
 
 
-    def __init__(self) -> None:
-
-        # Ejemplos
-
-        # self.image_to_bits("img.jpg", "binario.txt")
-        # self.bits_to_image("binario.txt", "prueba.jpg")
-
-        self.text_to_bits("texto.txt", "binario.txt")
-        self.bits_to_text("binario.txt", "texto2.txt")
-
-
     def bytes_to_bits(self, bytes):
         bits = ""
         for i in range(len(bytes)):
@@ -31,7 +20,7 @@ class convertirBinario:
     
 
     def image_to_bits(self, imagen = "img.jpg", binario = "binario.txt"):
-        with open("./imagenes/" + imagen, "rb") as image:
+        with open(imagen, "rb") as image:
             f = image.read()
             bytes = bytearray(f)
         
@@ -43,13 +32,13 @@ class convertirBinario:
     
 
     def bits_to_image(self, binario = "binario.txt", imagen = "prueba.jpg"):
-        fichero = open("./ficheros/" + binario)
+        fichero = open(binario)
         binario = fichero.read()
 
         bytes = bytearray(self.bits_to_bytes(binario))
         
         image = Image.open(io.BytesIO(bytes))
-        image.save("./imagenes/" + imagen)
+        image.save("."+ imagen)
 
 
     def bits_to_string(self, b=None):
@@ -59,7 +48,7 @@ class convertirBinario:
     def text_to_bits(self, texto = "texto2.txt", binario = "binario.txt"):
         bits = []
 
-        fichero = open("./ficheros/" + texto)
+        fichero = open(texto)
         while 1:
             char = fichero.read(1).lower()         
             if not char:
@@ -73,8 +62,9 @@ class convertirBinario:
 
 
     def bits_to_text(self, binario = "binario.txt", texto = "texto2.txt"):
-        fichero = open("./ficheros/" + binario)
+        fichero = open(binario)
         binario = fichero.read()
+        binario = binario.replace('\n', '')
 
         bytes = []
         for i in range(int(len(binario) / 8)):
@@ -84,9 +74,7 @@ class convertirBinario:
         for byte in bytes:
             texto_plano += chr(byte)
         
-        with open("./ficheros/" + texto, 'w') as fp:
+        with open(texto, 'w') as fp:
             for item in texto_plano:
                 fp.write("%s" % item)
         
-
-prueba = convertirBinario()
