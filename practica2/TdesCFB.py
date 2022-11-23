@@ -61,72 +61,49 @@ if args.clave:
         if j == 2:
             plus = 128
         contadorParidad.append(0)
-        if Key[7+plus] == '1':
-            contadorParidad[j]+=1
-        if Key[15+plus] == '1':
-            contadorParidad[j]+=1
-        if Key[23+plus] == '1':
-            contadorParidad[j]+=1
-        if Key[31+plus] == '1':
-            contadorParidad[j]+=1
-        if Key[39+plus] == '1':
-            contadorParidad[j]+=1
-        if Key[47+plus] == '1':
-            contadorParidad[j]+=1
-        if Key[55+plus] == '1':
-            contadorParidad[j]+=1  
-        if Key[63+plus] == '1':
-            contadorParidad[j]+=1   
+        bloq1 = []
+        bloq1.append(Key[0+plus:8+plus])
+        bloq1.append(Key[8+plus:16+plus])
+        bloq1.append(Key[16+plus:24+plus])
+        bloq1.append(Key[24+plus:32+plus])
+        bloq1.append(Key[32+plus:40+plus])
+        bloq1.append(Key[40+plus:48+plus])
+        bloq1.append(Key[48+plus:56+plus])
+        bloq1.append(Key[56+plus:64+plus])
 
-    if contadorParidad[0] % 2 == 0 or contadorParidad[1] %2 == 0 or contadorParidad[2] == 0:
-        print('La clave no cumple requisitos de paridad:')
-        sys.exit()
+        for b in bloq1:
+            contadorParidad = b.count('1')
+            
+            if contadorParidad % 2 == 0:
+                print('La clave no cumple los criterios de paridad')
+                sys.exit()
+
 
 else:
-    flag = 0
-    while flag == 0:
-        Key = []
-        #Genero aleatoriamente la clave
-        for i in range(192):
-            # randint function to generate
-            # 0, 1 randomly and converting
-            # the result into str
-            temp = str(random.randint(0, 1))
-            # Concatenation the random 0, 1
-            # to the final result
-            Key.append(temp)
-            contadorParidad = []
-        for j in range(3):
-            if j == 0:
-                plus = 0
-            if j == 1:
-                plus = 64
-            if j == 2:
-                plus = 128
-            contadorParidad.append(0)
-            if Key[7+plus] == '1':
-                contadorParidad[j]+=1
-            if Key[15+plus] == '1':
-                contadorParidad[j]+=1
-            if Key[23+plus] == '1':
-                contadorParidad[j]+=1
-            if Key[31+plus] == '1':
-                contadorParidad[j]+=1
-            if Key[39+plus] == '1':
-                contadorParidad[j]+=1
-            if Key[47+plus] == '1':
-                contadorParidad[j]+=1
-            if Key[55+plus] == '1':
-                contadorParidad[j]+=1  
-            if Key[63+plus] == '1':
-                contadorParidad[j]+=1   
+    Key = []
+    for k in range(3):
+        for j in range(8):
+            lstAux = []
+            #Genero aleatoriamente la clave
+            for i in range(7):
+                # randint function to generate
+                # 0, 1 randomly and converting
+                # the result into str
+                temp = str(random.randint(0, 1))
+                # Concatenation the random 0, 1
+                # to the final result
+                Key.append(temp)
+                lstAux.append(temp)
+            counterPari = lstAux.count('1')
+            if counterPari%2== 0:
+                Key.append('1')
+            else:
+                Key.append('0')
 
-        if contadorParidad[0] % 2 != 0 or contadorParidad[1] %2 != 0 or contadorParidad[2] != 0:
-            flag = 1
-            print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
-            print('k1: ' + "".join(Key[0:64]))
-            print('k2: ' + "".join(Key[64:128]))
-            print('k3: ' + "".join(Key[128:])+'\n')
+    print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
+    print('k1: ' + "".join(Key[0:64]))
+    print('k2: ' + "".join(Key[64:128]))
+    print('k3: ' + "".join(Key[128:])+'\n')
             
 
 entrada = open(os.getcwd()+"/ficheros/" + input)

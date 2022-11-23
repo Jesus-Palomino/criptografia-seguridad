@@ -56,32 +56,28 @@ if args.clave:
         if key != " " and key != '\n' and key != '':
             Key.append(key)
     contadorParidad = 0
-    if Key[7] == '1':
-        contadorParidad+=1
-    if Key[15] == '1':
-        contadorParidad+=1
-    if Key[23] == '1':
-        contadorParidad+=1
-    if Key[31] == '1':
-        contadorParidad+=1
-    if Key[39] == '1':
-        contadorParidad+=1
-    if Key[47] == '1':
-        contadorParidad+=1
-    if Key[55] == '1':
-        contadorParidad+=1  
-    if Key[63] == '1':
-        contadorParidad+=1   
+    bloq1 = []
+    bloq1.append(Key[0:8])
+    bloq1.append(Key[8:16])
+    bloq1.append(Key[16:24])
+    bloq1.append(Key[24:32])
+    bloq1.append(Key[32:40])
+    bloq1.append(Key[40:48])
+    bloq1.append(Key[48:56])
+    bloq1.append(Key[56:64])
 
-    if contadorParidad % 2 == 0:
-        print('La clave no cumple los criterios de paridad')
-        sys.exit()
+    for b in bloq1:
+        contadorParidad = b.count('1')
+
+        if contadorParidad % 2 == 0:
+            print('La clave no cumple los criterios de paridad')
+            sys.exit()
 else:
-    flag = 0
-    while flag == 0:
-        Key = []
+    Key = []
+    for j in range(8):
+        lstAux = []
         #Genero aleatoriamente la clave
-        for i in range(64):
+        for i in range(7):
             # randint function to generate
             # 0, 1 randomly and converting
             # the result into str
@@ -89,29 +85,16 @@ else:
             # Concatenation the random 0, 1
             # to the final result
             Key.append(temp)
+            lstAux.append(temp)
+        counterPari = lstAux.count('1')
+        if counterPari%2== 0:
+            Key.append('1')
+        else:
+            Key.append('0')
+    print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
+    print("".join(Key)+'\n\n')
 
-        contadorParidad = 0
-        if Key[7] == '1':
-            contadorParidad+=1
-        if Key[15] == '1':
-            contadorParidad+=1
-        if Key[24] == '1':
-            contadorParidad+=1
-        if Key[31] == '1':
-            contadorParidad+=1
-        if Key[39] == '1':
-            contadorParidad+=1
-        if Key[47] == '1':
-            contadorParidad+=1
-        if Key[55] == '1':
-            contadorParidad+=1  
-        if Key[63] == '1':
-            contadorParidad+=1   
-
-        if contadorParidad % 2 != 0:
-            flag = 1
-            print('Clave generada de forma automatica cumpliendo requisitos de paridad:')
-            print("".join(Key)+'\n\n')
+    
 Mtext = []
 Mtext_ini = []
 
